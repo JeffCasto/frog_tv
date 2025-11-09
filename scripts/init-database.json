@@ -1,0 +1,60 @@
+{
+  "frogs": {
+    "frog1": {
+      "id": "frog1",
+      "mood": "stoned",
+      "genreWeights": {
+        "mukbang": 0.8,
+        "sports": 0.1,
+        "asmr": 0.5,
+        "philosophy": 0.3
+      },
+      "action": "idle",
+      "targetX": 200,
+      "targetY": 400,
+      "thought": null
+    },
+    "frog2": {
+      "id": "frog2",
+      "mood": "philosophical",
+      "genreWeights": {
+        "mukbang": 0.2,
+        "sports": 0.3,
+        "asmr": 0.6,
+        "philosophy": 0.9
+      },
+      "action": "idle",
+      "targetX": 500,
+      "targetY": 420,
+      "thought": null
+    },
+    "frog3": {
+      "id": "frog3",
+      "mood": "excited",
+      "genreWeights": {
+        "mukbang": 0.9,
+        "sports": 0.7,
+        "asmr": 0.2,
+        "philosophy": 0.1
+      },
+      "action": "idle",
+      "targetX": 800,
+      "targetY": 400,
+      "thought": null
+    }
+  },
+  "triggers": {
+    "ribbitCount": 0,
+    "lastRibbitReset": 0,
+    "toadfatherSummoned": false,
+    "frogsWalkedOff": []
+  },
+  "lore": {
+    "welcome": {
+      "frogName": "all",
+      "event": "The Beginning",
+      "description": "Three frogs appeared on the couch. They looked at the TV. The TV looked back. And so it began.",
+      "timestamp": 0
+    }
+  }
+}
