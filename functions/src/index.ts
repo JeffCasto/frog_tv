@@ -62,7 +62,7 @@ async function updateFrog(frogId: string, updates: Partial<Frog>) {
 async function resetFrogAction(frogId: string, delayMs: number = 2500): Promise<true> {
   return new Promise((resolve) => {
     setTimeout(async () => {
-      await updateFrog(frogId, { action: 'idle', thought: null });
+      await updateFrog(frogId, { action: 'idle', thought: undefined });
       resolve(true);
     }, delayMs);
   });
@@ -273,7 +273,7 @@ async function summonToadfather() {
         updateFrog(frogId, {
           action: 'idle',
           mood: 'stoned',
-          thought: null,
+          thought: undefined,
         })
       );
       await Promise.all(resetPromises);
@@ -319,7 +319,7 @@ export const mysteriousEvent = onSchedule({ schedule: '33 3 * * *', timeZone: 'A
         await updateFrog(frogId, {
           action: 'idle',
           mood: 'stoned',
-          thought: null,
+          thought: undefined,
           targetX: 200 + Math.random() * 600,
           targetY: 400,
         });
@@ -404,21 +404,21 @@ export const monthlyExodus = onSchedule({ schedule: '0 0 1 * *', timeZone: 'Amer
             action: 'idle',
             targetX: 200,
             targetY: 400,
-            thought: null,
+            thought: undefined,
           }),
           updateFrog('frog2', {
             mood: 'philosophical',
             action: 'idle',
             targetX: 500,
             targetY: 420,
-            thought: null,
+            thought: undefined,
           }),
           updateFrog('frog3', {
             mood: 'excited',
             action: 'idle',
             targetX: 800,
             targetY: 400,
-            thought: null,
+            thought: undefined,
           }),
         ];
 
