@@ -129,7 +129,7 @@ export default function Lore() {
             transition={{ delay: 0.5 }}
             className="mt-16 text-center text-sm text-purple-400/50 italic"
           >
-            "The frogs remember everything. Do you?"
+            “The frogs remember everything. Do you?”
           </motion.div>
         </div>
       </main>

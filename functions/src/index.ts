@@ -1,4 +1,7 @@
 import * as functions from 'firebase-functions';
+// Use v2 database and scheduler providers for typed handlers
+import { onValueCreated, type DatabaseEvent, type DataSnapshot } from 'firebase-functions/v2/database';
+import { onSchedule, type ScheduledEvent } from 'firebase-functions/v2/scheduler';
 import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin
@@ -11,14 +14,13 @@ const db = admin.database();
 
 type FrogMood = 'stoned' | 'excited' | 'sleepy' | 'hungry' | 'philosophical';
 type FrogAction = 'idle' | 'croak' | 'throw' | 'catch' | 'summonToadfather' | 'walkOff';
-
 interface Frog {
   id: string;
   mood: FrogMood;
   action: FrogAction;
   targetX: number;
   targetY: number;
-  thought?: string;
+  thought?: string | null;
 }
 
 // ============================================================================
@@ -51,9 +53,12 @@ async function updateFrog(frogId: string, updates: Partial<Frog>) {
 }
 
 /**
- * Reset frog action to idle after a delay
+ * Reset frog action to idle after a delay.
+ * @param frogId - The ID of the frog to reset.
+ * @param delayMs - The delay in milliseconds before resetting.
+ * @returns Promise that resolves after the delay and reset.
  */
-async function resetFrogAction(frogId: string, delayMs: number = 2500) {
+async function resetFrogAction(frogId: string, delayMs: number = 2500): Promise<true> {
   return new Promise((resolve) => {
     setTimeout(async () => {
       await updateFrog(frogId, { action: 'idle', thought: null });
@@ -75,15 +80,14 @@ function randomFrogId(): string {
 // ============================================================================
 
 /**
+/**
  * Triggered whenever a new chat message is created.
  * Processes the message for keywords and triggers appropriate frog reactions.
  */
-export const onChatCreate = functions.database
-  .ref('/chat/{pushId}')
-  .onCreate(async (snapshot, context) => {
-    const message = snapshot.val();
-    const text = message.text.toLowerCase();
-
+export const onChatCreate = onValueCreated('/chat/{pushId}', async (event: DatabaseEvent<DataSnapshot, { pushId: string }>) => {
+  const snapshot = event.data;
+  const message = snapshot && typeof (snapshot as any).val === 'function' ? (snapshot as any).val() : snapshot;
+  const text = (message?.text || '').toString().toLowerCase();
     // Check for "ribbit" - increment counter and potentially summon Toadfather
     if (text.includes('ribbit')) {
       const triggersRef = db.ref('triggers');
@@ -116,8 +120,14 @@ export const onChatCreate = functions.database
           });
 
           // Reset summon flag after 5 minutes
-          setTimeout(async () => {
-            await triggersRef.update({ toadfatherSummoned: false });
+          setTimeout(() => {
+            (async () => {
+              try {
+                await triggersRef.update({ toadfatherSummoned: false });
+              } catch (error) {
+                console.error('Error resetting toadfatherSummoned:', error);
+              }
+            })();
           }, 300000);
         }
       }
@@ -131,7 +141,7 @@ export const onChatCreate = functions.database
         action: 'croak',
         thought: 'What is the nature of existence?',
       });
-      resetFrogAction('frog2', 4000);
+      await resetFrogAction('frog2', 4000);
     }
 
     // Check for food keywords
@@ -142,7 +152,7 @@ export const onChatCreate = functions.database
         action: 'croak',
         thought: 'I could really go for some flies right now...',
       });
-      resetFrogAction('frog3', 3000);
+      await resetFrogAction('frog3', 3000);
     }
 
     // Check for excitement keywords
@@ -154,7 +164,7 @@ export const onChatCreate = functions.database
         action: 'croak',
         thought: 'THIS IS AMAZING!',
       });
-      resetFrogAction(frogId, 2500);
+      await resetFrogAction(frogId, 2500);
     }
 
     // Check for sleep keywords
@@ -165,7 +175,7 @@ export const onChatCreate = functions.database
         action: 'idle',
         thought: '*yawn* ...zzz...',
       });
-      resetFrogAction('frog1', 5000);
+      await resetFrogAction('frog1', 5000);
     }
 
     return null;
@@ -179,7 +189,7 @@ export const onChatCreate = functions.database
  * Callable function to throw a fly to the frogs.
  * A random frog will catch it.
  */
-export const throwFly = functions.https.onCall(async (data, context) => {
+export const throwFly = functions.https.onCall(async (data: any, context: any) => {
   const frogId = randomFrogId();
 
   await updateFrog(frogId, {
@@ -194,7 +204,7 @@ export const throwFly = functions.https.onCall(async (data, context) => {
     `${frogId} successfully caught a fly thrown by a viewer. Delicious!`
   );
 
-  resetFrogAction(frogId, 3000);
+  await resetFrogAction(frogId, 3000);
 
   return { success: true, frogId };
 });
@@ -206,7 +216,7 @@ export const throwFly = functions.https.onCall(async (data, context) => {
 /**
  * Callable function to make all frogs croak simultaneously.
  */
-export const triggerCroak = functions.https.onCall(async (data, context) => {
+export const triggerCroak = functions.https.onCall(async (data: any, context: any) => {
   const promises = ['frog1', 'frog2', 'frog3'].map(frogId =>
     updateFrog(frogId, {
       action: 'croak',
@@ -215,24 +225,25 @@ export const triggerCroak = functions.https.onCall(async (data, context) => {
 
   await Promise.all(promises);
 
-  // Reset all frogs after croaking
   setTimeout(async () => {
-    const resetPromises = ['frog1', 'frog2', 'frog3'].map(frogId =>
-      updateFrog(frogId, { action: 'idle' })
-    );
-    await Promise.all(resetPromises);
+    try {
+      const resetPromises = ['frog1', 'frog2', 'frog3'].map(frogId =>
+        updateFrog(frogId, { action: 'idle' })
+      );
+      await Promise.all(resetPromises);
+    } catch (error) {
+      console.error('Error resetting frogs after croak:', error);
+    }
   }, 1500);
 
   return { success: true };
 });
 
 // ============================================================================
-// CLOUD FUNCTION: summonToadfather (Internal)
-// ============================================================================
-
 /**
- * Summon the mysterious Toadfather when 30 ribbits are reached.
+ * INTERNAL: Summon the mysterious Toadfather when 30 ribbits are reached.
  * All frogs perform a ritual animation.
+ * This function is intended for internal use only.
  */
 async function summonToadfather() {
   // All frogs perform summon ritual
@@ -249,36 +260,34 @@ async function summonToadfather() {
   // Add dramatic lore event
   await addLoreEvent(
     'all',
-    'The Toadfather Summoning',
-    'Through the collective will of the chat, speaking the sacred word "ribbit" thirty times, the Toadfather has been summoned. The frogs entered a trance-like state, performing an ancient ritual. What mysteries were revealed? Only the frogs know...'
+    'Toadfather Summoned',
+    'The Toadfather has been summoned in a chorus of ancient ribbits.'
   );
 
   // Reset frogs after ritual (longer delay for dramatic effect)
   setTimeout(async () => {
-    const resetPromises = ['frog1', 'frog2', 'frog3'].map(frogId =>
-      updateFrog(frogId, {
-        action: 'idle',
-        mood: 'stoned',
-        thought: null,
-      })
-    );
-    await Promise.all(resetPromises);
+    try {
+      const resetPromises = ['frog1', 'frog2', 'frog3'].map(frogId =>
+        updateFrog(frogId, {
+          action: 'idle',
+          mood: 'stoned',
+          thought: null,
+        })
+      );
+      await Promise.all(resetPromises);
+    } catch (error) {
+      console.error('Error resetting frogs after ritual:', error);
+    }
   }, 5000);
 }
 
-// ============================================================================
-// SCHEDULED FUNCTION: midnightMysteries
-// ============================================================================
-
 /**
- * Runs every day at 3:33 AM.
- * Mysterious things happen...
+ * SCHEDULED FUNCTION: mysteriousEvent
+ * Runs every day at 3:33 AM America/Los_Angeles time.
+ * Runs every day at 3:33 AM America/Los_Angeles time.
  */
-export const midnightMysteries = functions.pubsub
-  .schedule('33 3 * * *')
-  .timeZone('America/Los_Angeles')
-  .onRun(async (context) => {
-    // Random chance for different mysterious events
+export const mysteriousEvent = onSchedule({ schedule: '33 3 * * *', timeZone: 'America/Los_Angeles' },
+  async (event: ScheduledEvent) => {
     const roll = Math.random();
 
     if (roll < 0.3) {
@@ -356,7 +365,7 @@ export const midnightMysteries = functions.pubsub
       );
     }
 
-    return null;
+  return;
   });
 
 // ============================================================================
@@ -367,11 +376,8 @@ export const midnightMysteries = functions.pubsub
  * Runs on the first day of every month.
  * All frogs walk off and are replaced by new frogs.
  */
-export const monthlyExodus = functions.pubsub
-  .schedule('0 0 1 * *')
-  .timeZone('America/Los_Angeles')
-  .onRun(async (context) => {
-    // All frogs walk off
+export const monthlyExodus = onSchedule({ schedule: '0 0 1 * *', timeZone: 'America/Los_Angeles' },
+  async (event: ScheduledEvent) => {
     const walkOffPromises = ['frog1', 'frog2', 'frog3'].map(frogId =>
       updateFrog(frogId, {
         action: 'walkOff',
@@ -383,44 +389,48 @@ export const monthlyExodus = functions.pubsub
 
     await addLoreEvent(
       'all',
-      'The Great Exodus',
-      'On the first day of the month, all three frogs stood up simultaneously and walked off screen. Their journey is complete. New frogs will arrive soon to take their place on the couch. The cycle continues.'
+      'The Exodus Begins',
+      'All frogs have departed briefly; something strange stirs behind the couch.'
     );
 
-    // After 30 seconds, replace with new frogs (reset positions and moods)
+    // Reset the frogs after a delay and declare the new generation
     setTimeout(async () => {
-      const resetPromises = [
-        updateFrog('frog1', {
-          mood: 'stoned',
-          action: 'idle',
-          targetX: 200,
-          targetY: 400,
-          thought: null,
-        }),
-        updateFrog('frog2', {
-          mood: 'philosophical',
-          action: 'idle',
-          targetX: 500,
-          targetY: 420,
-          thought: null,
-        }),
-        updateFrog('frog3', {
-          mood: 'excited',
-          action: 'idle',
-          targetX: 800,
-          targetY: 400,
-          thought: null,
-        }),
-      ];
+      try {
+        const resetPromises = [
+          updateFrog('frog1', {
+            mood: 'stoned',
+            action: 'idle',
+            targetX: 200,
+            targetY: 400,
+            thought: null,
+          }),
+          updateFrog('frog2', {
+            mood: 'philosophical',
+            action: 'idle',
+            targetX: 500,
+            targetY: 420,
+            thought: null,
+          }),
+          updateFrog('frog3', {
+            mood: 'excited',
+            action: 'idle',
+            targetX: 800,
+            targetY: 400,
+            thought: null,
+          }),
+        ];
 
-      await Promise.all(resetPromises);
+        await Promise.all(resetPromises);
 
-      await addLoreEvent(
-        'all',
-        'The New Generation',
-        'New frogs have arrived to take their place on the couch. They know nothing of what came before. They know only the TV.'
-      );
+        await addLoreEvent(
+          'all',
+          'The New Generation',
+          'New frogs have arrived to take their place on the couch. They know nothing of what came before. They know only the TV.'
+        );
+      } catch (error) {
+        console.error('Error during frog reset in monthlyExodus:', error);
+      }
     }, 30000);
 
-    return null;
+  return;
   });

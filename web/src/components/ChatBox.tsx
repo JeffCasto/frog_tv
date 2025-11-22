@@ -45,7 +45,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({ messages, onSendMessage, usern
           Live Chat
         </h2>
         <p className="text-xs text-gray-400 mt-1">
-          Try typing "ribbit" to summon the Toadfather...
+          Try typing “ribbit” to summon the Toadfather...
         </p>
       </div>
 

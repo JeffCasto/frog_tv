@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import { motion } from 'framer-motion';
-import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { ChatBox } from '@/components/ChatBox';
 import { ActionButtons } from '@/components/ActionButtons';
 import { useFrogs } from '@/hooks/useFrogs';
@@ -9,11 +9,7 @@ import { useTriggers } from '@/hooks/useTriggers';
 import { useUsername } from '@/hooks/useUsername';
 import { cloudFunctions } from '@/lib/firebase';
 
-// Dynamically import Mux Player to avoid SSR issues
-const MuxPlayer = dynamic(
-  () => import('@mux/mux-player-react'),
-  { ssr: false }
-);
+// Use YouTube live embed via iframe instead of Mux player
 
 export default function Home() {
   const { frogsArray, loading: frogsLoading } = useFrogs();
@@ -46,7 +42,7 @@ export default function Home() {
     }
   };
 
-  const muxPlaybackId = process.env.NEXT_PUBLIC_MUX_PLAYBACK_ID;
+  const youtubeVideoId = process.env.NEXT_PUBLIC_YOUTUBE_VIDEO_ID;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
@@ -66,12 +62,12 @@ export default function Home() {
                 <span className="text-gray-400">Signed in as:</span>{' '}
                 <span className="text-frog-green font-semibold">{username}</span>
               </div>
-              <a
+              <Link
                 href="/lore"
                 className="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg font-semibold transition-colors"
               >
                 📜 Lore
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -89,19 +85,21 @@ export default function Home() {
               className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 overflow-hidden shadow-2xl"
             >
               <div className="aspect-video bg-black relative">
-                {muxPlaybackId ? (
-                  <MuxPlayer
-                    playbackId={muxPlaybackId}
-                    streamType="live"
-                    autoPlay
-                    muted
+                {youtubeVideoId ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${youtubeVideoId}/live`}
+                    width="100%"
+                    height="100%"
+                    frameBorder="0"
+                    allow="autoplay; encrypted-media"
+                    allowFullScreen
                     className="w-full h-full"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-500">
                     <div className="text-center">
                       <p className="text-xl mb-2">📺 Stream Offline</p>
-                      <p className="text-sm">Configure NEXT_PUBLIC_MUX_PLAYBACK_ID in .env.local</p>
+                      <p className="text-sm">Configure NEXT_PUBLIC_YOUTUBE_VIDEO_ID in .env.local</p>
                     </div>
                   </div>
                 )}
@@ -151,7 +149,7 @@ export default function Home() {
                         </p>
                         {frog.thought && (
                           <p className="text-xs italic text-purple-300 mt-2">
-                            💭 "{frog.thought}"
+                            💭 “{frog.thought}”
                           </p>
                         )}
                       </div>

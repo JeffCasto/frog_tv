@@ -30,37 +30,55 @@ export default function Stage() {
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-transparent">
-      {/* Couch background (optional - can be removed if you have a separate scene for the couch) */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[900px] h-[300px]">
-        <svg viewBox="0 0 900 300" className="w-full h-full">
+      {/* Couch positioned at bottom third of screen */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[900px] h-[280px]">
+        <svg viewBox="0 0 900 280" className="w-full h-full">
           {/* Couch body */}
-          <rect x="50" y="100" width="800" height="150" fill="#8B4513" rx="20" />
+          <rect x="50" y="90" width="800" height="150" fill="#8B4513" rx="20" />
 
           {/* Couch cushions */}
-          <rect x="70" y="90" width="240" height="120" fill="#A0522D" rx="15" />
-          <rect x="330" y="90" width="240" height="120" fill="#A0522D" rx="15" />
-          <rect x="590" y="90" width="240" height="120" fill="#A0522D" rx="15" />
+          <rect x="70" y="80" width="240" height="120" fill="#A0522D" rx="15" />
+          <rect x="330" y="80" width="240" height="120" fill="#A0522D" rx="15" />
+          <rect x="590" y="80" width="240" height="120" fill="#A0522D" rx="15" />
 
           {/* Couch backrest */}
-          <rect x="50" y="50" width="800" height="60" fill="#8B4513" rx="10" />
+          <rect x="50" y="40" width="800" height="60" fill="#8B4513" rx="10" />
 
           {/* Couch arms */}
-          <rect x="20" y="70" width="60" height="150" fill="#8B4513" rx="15" />
-          <rect x="820" y="70" width="60" height="150" fill="#8B4513" rx="15" />
+          <rect x="20" y="60" width="60" height="150" fill="#8B4513" rx="15" />
+          <rect x="820" y="60" width="60" height="150" fill="#8B4513" rx="15" />
 
           {/* Couch legs */}
-          <rect x="80" y="250" width="30" height="40" fill="#654321" rx="5" />
-          <rect x="250" y="250" width="30" height="40" fill="#654321" rx="5" />
-          <rect x="620" y="250" width="30" height="40" fill="#654321" rx="5" />
-          <rect x="790" y="250" width="30" height="40" fill="#654321" rx="5" />
+          <rect x="80" y="240" width="30" height="35" fill="#654321" rx="5" />
+          <rect x="250" y="240" width="30" height="35" fill="#654321" rx="5" />
+          <rect x="620" y="240" width="30" height="35" fill="#654321" rx="5" />
+          <rect x="790" y="240" width="30" height="35" fill="#654321" rx="5" />
         </svg>
       </div>
 
-      {/* Frogs */}
+      {/* Frogs - positioned to sit ON the couch cushions */}
       <AnimatePresence>
-        {frogsArray.map((frog) => (
-          <Frog key={frog.id} frog={frog} />
-        ))}
+        {frogsArray.map((frog, index) => {
+          // Override frog positions to sit properly on couch
+          // Couch is centered, so calculate positions relative to center
+          const couchCenterX = typeof window !== 'undefined' ? window.innerWidth / 2 : 960;
+          const couchY = typeof window !== 'undefined' ? window.innerHeight - 240 : 840;
+          
+          // Position frogs on each cushion (left, center, right)
+          const frogX = couchCenterX + (index === 0 ? -280 : index === 1 ? 0 : 280);
+          const frogY = couchY - 80; // Sit on cushions, not floor
+          
+          return (
+            <Frog 
+              key={frog.id} 
+              frog={{
+                ...frog,
+                targetX: frogX,
+                targetY: frogY
+              }} 
+            />
+          );
+        })}
       </AnimatePresence>
 
       {/* Stage info overlay (only visible in dev mode) */}

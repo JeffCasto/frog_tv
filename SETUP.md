@@ -139,34 +139,36 @@ You should see:
 4. Click "Throw Fly" → Random frog catches it
 5. Click "Trigger Croak" → All frogs croak
 
-### 7. Set Up Mux (For Livestreaming)
+### 7. Set Up Video Source (YouTube Live or Mux)
 
-#### Create Mux Account
+You can use either YouTube Live or Mux as the tiny TV's video source. The web app will prefer a YouTube embed if `NEXT_PUBLIC_YOUTUBE_VIDEO_ID` is set; otherwise you can use Mux with `NEXT_PUBLIC_MUX_PLAYBACK_ID`.
 
-1. Go to [mux.com](https://mux.com)
-2. Sign up (free tier: 5,000 minutes/month)
-3. Verify email
+#### Option A: YouTube Live (Recommended)
 
-#### Create Live Stream
+1. Go to [YouTube Studio](https://studio.youtube.com)
+2. Click "Go Live" → "Stream"
+3. Copy the **Live Video ID** from the URL (it appears after /watch?v=)
+4. Update `web/.env.local`:
+```
+NEXT_PUBLIC_YOUTUBE_VIDEO_ID=your_youtube_video_id_here
+```
+5. Restart dev server:
+```bash
+npm run dev
+```
 
-1. Go to Mux Dashboard
-2. Click "Live Streams"
-3. Click "Create New Live Stream"
-4. Settings:
-   - Latency Mode: Standard
-   - Recording: Disabled (for testing)
-5. Copy:
-   - **Stream Key** (for OBS)
-   - **Playback ID** (for web player)
+#### Option B: Mux (Optional)
 
-#### Add to Environment
+If you prefer Mux for streaming: create a stream on Mux and add the Playback ID to the environment.
 
-Update `web/.env.local`:
+1. Go to [mux.com](https://mux.com) and create an account
+2. Create a new Live Stream
+3. Copy the **Stream Key** for OBS and the **Playback ID** for the player
+4. Update `web/.env.local`:
 ```
 NEXT_PUBLIC_MUX_PLAYBACK_ID=your_playback_id_here
 ```
-
-Restart dev server:
+5. Restart the dev server:
 ```bash
 npm run dev
 ```

@@ -83,7 +83,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       <div className="bg-gray-900/90 backdrop-blur-sm rounded-lg border border-gray-700 p-4 shadow-xl">
         <h3 className="text-sm font-bold text-gray-400 mb-2">💡 Pro Tips</h3>
         <ul className="text-xs text-gray-500 space-y-1">
-          <li>• Type "ribbit" in chat to summon the Toadfather</li>
+          <li>• Type “ribbit” in chat to summon the Toadfather</li>
           <li>• Say philosophy words for deep thoughts</li>
           <li>• Mention food to make frogs hungry</li>
           <li>• Watch at 3:33 AM for mysteries...</li>

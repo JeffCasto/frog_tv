@@ -21,7 +21,7 @@ This creates a recursive loop of entertainment that's oddly mesmerizing. It's in
 ```
 ┌─────────────────────────────────────────────┐
 │  Next.js Web App (Viewer Experience)       │
-│  - Mux Video Player                         │
+│  - YouTube Embed (preferred) or Mux Video Player │
 │  - Real-time Chat                           │
 │  - Interaction Buttons                      │
 └─────────────────────────────────────────────┘
@@ -56,7 +56,7 @@ This creates a recursive loop of entertainment that's oddly mesmerizing. It's in
 
 1. **Node.js 18+** installed
 2. **Firebase account** (free Spark plan)
-3. **Mux account** (free 5,000 min/month)
+3. **(Optional)** Mux account (or a YouTube account for live streams)
 4. **OBS Studio 28+** installed
 5. **(Optional)** Domain name
 
@@ -174,7 +174,8 @@ NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-NEXT_PUBLIC_MUX_PLAYBACK_ID=your_mux_playback_id
+NEXT_PUBLIC_YOUTUBE_VIDEO_ID=your_youtube_video_id
+# (Optional) NEXT_PUBLIC_MUX_PLAYBACK_ID=your_mux_playback_id
 ```
 
 ### Step 4: Deploy Cloud Functions
@@ -228,15 +229,25 @@ Open [http://localhost:3000](http://localhost:3000)
    - Add **Scene Source**: FrogStage (top layer)
      - Full screen overlay
 
-### Mux Streaming Setup
+### Video Streaming Setup (YouTube / Mux)
 
-1. Create Mux account at [mux.com](https://mux.com)
+You can either stream to YouTube or Mux. Below are the setup steps for both:
+
+#### YouTube
+1. Use YouTube Studio to create a live stream and obtain the stream key
+2. In OBS: Settings → Stream
+  - Service: YouTube / YouTube Gaming
+  - Stream Key: `<your-youtube-stream-key>`
+3. Use the live video ID in `web/.env.local` as `NEXT_PUBLIC_YOUTUBE_VIDEO_ID` or use the embed URL directly in OBS browser source
+
+#### Mux (Optional)
+1. Create a Mux account at [mux.com](https://mux.com)
 2. Create a new **Live Stream**
 3. Copy the **RTMP URL** and **Stream Key**
 4. In OBS: Settings → Stream
-   - Service: Custom
-   - Server: `rtmp://global-live.mux.com:5222/app`
-   - Stream Key: `<your-stream-key>`
+  - Service: Custom
+  - Server: `rtmp://global-live.mux.com:5222/app`
+  - Stream Key: `<your-stream-key>`
 5. Copy the **Playback ID** to your `.env.local` as `NEXT_PUBLIC_MUX_PLAYBACK_ID`
 
 ### Start Streaming

@@ -14,7 +14,7 @@ A complete, production-ready interactive livestreaming platform where three anim
   - `ChatBox.tsx` - Real-time chat interface
   - `ActionButtons.tsx` - Viewer interaction controls
 - **Pages**:
-  - `/` - Main viewer page with Mux video player
+  - `/` - Main viewer page with embedded YouTube live (or Mux playback if configured)
   - `/stage` - OBS browser source with transparent background
   - `/lore` - Historical events timeline
 - **Hooks**:
@@ -99,7 +99,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 - **Couch Scene**: Built-in SVG couch graphic
 - **Optimized for Streaming**: 1920x1080 @ 30fps
 
-### Mux Video Streaming
+### Video Streaming (YouTube / Mux)
 - HLS livestream player
 - Low-latency streaming
 - Automatic transcoding
@@ -113,7 +113,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 │  - React Components                         │
 │  - Framer Motion Animations                 │
 │  - Tailwind Styling                         │
-│  - Mux Video Player                         │
+│  - YouTube embed (preferred) or Mux Video Player │
 └─────────────────────────────────────────────┘
                     ↓↑
 ┌─────────────────────────────────────────────┐
@@ -132,7 +132,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 └─────────────────────────────────────────────┘
                     ↓↑
 ┌─────────────────────────────────────────────┐
-│  OBS STUDIO → MUX STREAMING                │
+│  OBS STUDIO → YouTube / Mux Streaming      │
 │  - Frog stage (browser source)              │
 │  - Tiny TV (video/browser source)           │
 │  - Composite scene                          │
@@ -148,7 +148,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 - **Tailwind CSS** - Utility-first styling
 - **Framer Motion** - Animations
 - **Lucide React** - Icons
-- **Mux Player React** - Video streaming
+- **YouTube embed (preferred)** or **Mux Player React** - Video streaming
 
 ### Backend
 - **Firebase Realtime Database** - Real-time data sync
@@ -157,7 +157,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 
 ### Streaming
 - **OBS Studio** - Streaming software
-- **Mux** - Video platform (RTMP ingest, HLS delivery)
+- **Mux** - Video platform (RTMP ingest, HLS delivery) (optional)
 
 ### Deployment
 - **Vercel** - Frontend hosting (recommended)
