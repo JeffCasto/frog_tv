@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ChatBox } from '@/components/ChatBox';
 import { ActionButtons } from '@/components/ActionButtons';
+import { SoundControls } from '@/components/SoundControls';
 import { useFrogs } from '@/hooks/useFrogs';
 import { useChat } from '@/hooks/useChat';
 import { useTriggers } from '@/hooks/useTriggers';
@@ -175,6 +176,15 @@ export default function Home() {
                 onTriggerCroak={handleTriggerCroak}
                 ribbitCount={ribbitCount}
               />
+            </motion.div>
+
+            {/* Sound Controls */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.25 }}
+            >
+              <SoundControls />
             </motion.div>
 
             {/* Chat */}
