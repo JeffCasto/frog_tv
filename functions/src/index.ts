@@ -1,4 +1,5 @@
-import * as functions from 'firebase-functions';
+// Use v2 providers (no v1 import)
+import { onCall, type CallableRequest, type CallableResponse } from 'firebase-functions/v2/https';
 // Use v2 database and scheduler providers for typed handlers
 import { onValueCreated, type DatabaseEvent, type DataSnapshot } from 'firebase-functions/v2/database';
 import { onSchedule, type ScheduledEvent } from 'firebase-functions/v2/scheduler';
@@ -189,7 +190,7 @@ export const onChatCreate = onValueCreated('/chat/{pushId}', async (event: Datab
  * Callable function to throw a fly to the frogs.
  * A random frog will catch it.
  */
-export const throwFly = functions.https.onCall(async (data: any, context: any) => {
+export const throwFly = onCall(async (req: CallableRequest<any>, res?: CallableResponse<any>) => {
   const frogId = randomFrogId();
 
   await updateFrog(frogId, {
@@ -216,7 +217,8 @@ export const throwFly = functions.https.onCall(async (data: any, context: any) =
 /**
  * Callable function to make all frogs croak simultaneously.
  */
-export const triggerCroak = functions.https.onCall(async (data: any, context: any) => {
+export const triggerCroak = onCall(async (req: CallableRequest<any>, res?: CallableResponse<any>) => {
+  // data is available via req.data if needed
   const promises = ['frog1', 'frog2', 'frog3'].map(frogId =>
     updateFrog(frogId, {
       action: 'croak',

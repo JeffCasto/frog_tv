@@ -14,7 +14,7 @@ A complete, production-ready interactive livestreaming platform where three anim
   - `ChatBox.tsx` - Real-time chat interface
   - `ActionButtons.tsx` - Viewer interaction controls
 - **Pages**:
-  - `/` - Main viewer page with embedded YouTube live (or Mux playback if configured)
+  - `/` - Main viewer page with embedded YouTube live
   - `/stage` - OBS browser source with transparent background
   - `/lore` - Historical events timeline
 - **Hooks**:
@@ -99,11 +99,10 @@ A complete, production-ready interactive livestreaming platform where three anim
 - **Couch Scene**: Built-in SVG couch graphic
 - **Optimized for Streaming**: 1920x1080 @ 30fps
 
-### Video Streaming (YouTube / Mux)
-- HLS livestream player
-- Low-latency streaming
-- Automatic transcoding
-- Production-ready
+### Video Streaming (YouTube)
+ - Live stream embed
+ - Low-latency streaming
+ - Production-ready
 
 ## 🏗️ Architecture
 
@@ -113,7 +112,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 │  - React Components                         │
 │  - Framer Motion Animations                 │
 │  - Tailwind Styling                         │
-│  - YouTube embed (preferred) or Mux Video Player │
+│  - YouTube embed (preferred) │
 └─────────────────────────────────────────────┘
                     ↓↑
 ┌─────────────────────────────────────────────┐
@@ -132,11 +131,11 @@ A complete, production-ready interactive livestreaming platform where three anim
 └─────────────────────────────────────────────┘
                     ↓↑
 ┌─────────────────────────────────────────────┐
-│  OBS STUDIO → YouTube / Mux Streaming      │
+│  OBS STUDIO → YouTube Streaming            │
 │  - Frog stage (browser source)              │
 │  - Tiny TV (video/browser source)           │
 │  - Composite scene                          │
-│  - RTMP → Mux → HLS                        │
+│  - RTMP → YouTube Live                      │
 └─────────────────────────────────────────────┘
 ```
 
@@ -148,7 +147,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 - **Tailwind CSS** - Utility-first styling
 - **Framer Motion** - Animations
 - **Lucide React** - Icons
-- **YouTube embed (preferred)** or **Mux Player React** - Video streaming
+- **YouTube embed (preferred)** - Video streaming
 
 ### Backend
 - **Firebase Realtime Database** - Real-time data sync
@@ -157,7 +156,7 @@ A complete, production-ready interactive livestreaming platform where three anim
 
 ### Streaming
 - **OBS Studio** - Streaming software
-- **Mux** - Video platform (RTMP ingest, HLS delivery) (optional)
+- **YouTube** - Live streaming (RTMP ingest)
 
 ### Deployment
 - **Vercel** - Frontend hosting (recommended)
@@ -201,11 +200,11 @@ A complete, production-ready interactive livestreaming platform where three anim
 - ⚠️ Database initialization
 - ⚠️ Cloud Functions deployment
 - ⚠️ Environment variable configuration
-- ⚠️ Mux account setup (optional for local testing)
+ 
 
 ### Post-Setup Tasks
 - 📝 OBS scene configuration
-- 📝 Mux stream key configuration
+ 
 - 📝 Domain setup (optional)
 - 📝 Analytics setup (optional)
 
@@ -241,7 +240,7 @@ Before going live, verify:
 - [ ] Keyword triggers work (philosophy, food, etc.)
 - [ ] Action buttons trigger Cloud Functions
 - [ ] OBS browser source shows frogs
-- [ ] Mux stream plays in web player
+ - [ ] Video playback works in web player
 - [ ] Lore page shows events
 - [ ] All animations smooth
 - [ ] Mobile responsive (chat/viewing)
@@ -263,7 +262,7 @@ This project demonstrates:
 - [Next.js Docs](https://nextjs.org/docs)
 - [Firebase Docs](https://firebase.google.com/docs)
 - [Framer Motion Docs](https://www.framer.com/motion/)
-- [Mux Docs](https://docs.mux.com/)
+<!-- Mux docs removed; we now use YouTube live streaming -->
 - [OBS Studio Docs](https://obsproject.com/wiki/)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
 

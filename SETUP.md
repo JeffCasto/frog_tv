@@ -8,7 +8,7 @@ Follow these steps to get FrogTV Live up and running.
 - [ ] npm or yarn installed
 - [ ] Git installed
 - [ ] Firebase account created
-- [ ] Mux account created (optional for local testing)
+ 
 - [ ] OBS Studio installed
 
 ## Step-by-Step Setup
@@ -139,11 +139,11 @@ You should see:
 4. Click "Throw Fly" → Random frog catches it
 5. Click "Trigger Croak" → All frogs croak
 
-### 7. Set Up Video Source (YouTube Live or Mux)
+### 7. Set Up Video Source (YouTube Live)
 
-You can use either YouTube Live or Mux as the tiny TV's video source. The web app will prefer a YouTube embed if `NEXT_PUBLIC_YOUTUBE_VIDEO_ID` is set; otherwise you can use Mux with `NEXT_PUBLIC_MUX_PLAYBACK_ID`.
+YouTube Live is the supported video source for the tiny TV. Provide a YouTube Live video id and the app will embed it in the player.
 
-#### Option A: YouTube Live (Recommended)
+#### YouTube Live (Recommended)
 
 1. Go to [YouTube Studio](https://studio.youtube.com)
 2. Click "Go Live" → "Stream"
@@ -153,22 +153,6 @@ You can use either YouTube Live or Mux as the tiny TV's video source. The web ap
 NEXT_PUBLIC_YOUTUBE_VIDEO_ID=your_youtube_video_id_here
 ```
 5. Restart dev server:
-```bash
-npm run dev
-```
-
-#### Option B: Mux (Optional)
-
-If you prefer Mux for streaming: create a stream on Mux and add the Playback ID to the environment.
-
-1. Go to [mux.com](https://mux.com) and create an account
-2. Create a new Live Stream
-3. Copy the **Stream Key** for OBS and the **Playback ID** for the player
-4. Update `web/.env.local`:
-```
-NEXT_PUBLIC_MUX_PLAYBACK_ID=your_playback_id_here
-```
-5. Restart the dev server:
 ```bash
 npm run dev
 ```
@@ -216,8 +200,8 @@ Download from [obsproject.com](https://obsproject.com)
 
 1. Settings → Stream
 2. Service: Custom
-3. Server: `rtmp://global-live.mux.com:5222/app`
-4. Stream Key: `<your-mux-stream-key>`
+3. Server: `rtmp://a.rtmp.youtube.com/live2` (YouTube RTMP server)
+4. Stream Key: `<your-youtube-stream-key>`
 5. Click OK
 
 #### Test Stream
@@ -292,13 +276,13 @@ firebase deploy --only database
 ### Video player not loading
 
 **Check:**
-1. Mux playback ID correct?
+1. YouTube live video id correct?
 2. Stream key correct in OBS?
 3. Actually streaming from OBS?
 
 **Fix:**
-1. Verify NEXT_PUBLIC_MUX_PLAYBACK_ID in .env.local
-2. Check Mux dashboard for active stream
+1. Verify NEXT_PUBLIC_YOUTUBE_VIDEO_ID in .env.local
+2. Check YouTube Studio for live stream status
 
 ## Next Steps
 
