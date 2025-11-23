@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Frog as FrogType, MOOD_STYLES } from '@/types';
+import { useSoundEffects, getSoundForAction } from '@/hooks/useSoundEffects';
 
 interface FrogProps {
   frog: FrogType;
@@ -8,6 +9,19 @@ interface FrogProps {
 
 export const Frog: React.FC<FrogProps> = ({ frog }) => {
   const moodStyle = MOOD_STYLES[frog.mood];
+  const { play } = useSoundEffects();
+  const prevActionRef = useRef<string>(frog.action);
+
+  // Play sound when action changes
+  useEffect(() => {
+    if (frog.action !== prevActionRef.current) {
+      const sound = getSoundForAction(frog.action);
+      if (sound) {
+        play(sound);
+      }
+      prevActionRef.current = frog.action;
+    }
+  }, [frog.action, play]);
 
   // Animation variants based on action
   const actionVariants = {
