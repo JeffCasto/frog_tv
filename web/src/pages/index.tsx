@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { ChatBox } from '@/components/ChatBox';
 import { ActionButtons } from '@/components/ActionButtons';
 import { SoundControls } from '@/components/SoundControls';
+import { Frog } from '@/components/Frog';
 import { useFrogs } from '@/hooks/useFrogs';
 import { useChat } from '@/hooks/useChat';
 import { useTriggers } from '@/hooks/useTriggers';
@@ -122,7 +123,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            {/* Frog Info */}
+            {/* Living Room with Frogs */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -133,29 +134,65 @@ export default function Home() {
               {frogsLoading ? (
                 <p className="text-gray-400">Loading frogs...</p>
               ) : frogsArray.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {frogsArray.map((frog) => (
-                    <div
-                      key={frog.id}
-                      className="bg-gray-800/50 rounded-lg p-4 border border-gray-700"
-                    >
-                      <div className="text-4xl mb-2">🐸</div>
-                      <h3 className="font-bold capitalize mb-1">{frog.id}</h3>
-                      <div className="text-sm space-y-1">
-                        <p className="text-gray-400">
-                          Mood: <span className="text-frog-green capitalize">{frog.mood}</span>
-                        </p>
-                        <p className="text-gray-400">
-                          Action: <span className="text-frog-lime capitalize">{frog.action}</span>
-                        </p>
-                        {frog.thought && (
-                          <p className="text-xs italic text-purple-300 mt-2">
-                            💭 “{frog.thought}”
-                          </p>
-                        )}
-                      </div>
+                <div className="relative w-full h-[300px] bg-gradient-to-b from-gray-800 to-gray-900 rounded-lg overflow-hidden">
+                  {/* Living Room Background */}
+                  <div className="absolute inset-0">
+                    {/* Floor */}
+                    <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-amber-900/30 to-transparent" />
+
+                    {/* Lamp */}
+                    <div className="absolute top-4 right-8">
+                      <div className="w-8 h-12 bg-yellow-200/20 rounded-t-full blur-sm" />
+                      <div className="w-1 h-16 bg-gray-600 mx-auto" />
                     </div>
-                  ))}
+                  </div>
+
+                  {/* Couch */}
+                  <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-[500px] h-[140px]">
+                    <svg viewBox="0 0 500 140" className="w-full h-full">
+                      {/* Couch body */}
+                      <rect x="25" y="45" width="450" height="75" fill="#8B4513" rx="10" />
+
+                      {/* Couch cushions */}
+                      <rect x="35" y="40" width="135" height="60" fill="#A0522D" rx="8" />
+                      <rect x="182" y="40" width="135" height="60" fill="#A0522D" rx="8" />
+                      <rect x="330" y="40" width="135" height="60" fill="#A0522D" rx="8" />
+
+                      {/* Couch backrest */}
+                      <rect x="25" y="20" width="450" height="30" fill="#8B4513" rx="5" />
+
+                      {/* Couch arms */}
+                      <rect x="10" y="30" width="30" height="75" fill="#8B4513" rx="8" />
+                      <rect x="460" y="30" width="30" height="75" fill="#8B4513" rx="8" />
+
+                      {/* Couch legs */}
+                      <rect x="45" y="120" width="15" height="18" fill="#654321" rx="3" />
+                      <rect x="140" y="120" width="15" height="18" fill="#654321" rx="3" />
+                      <rect x="345" y="120" width="15" height="18" fill="#654321" rx="3" />
+                      <rect x="440" y="120" width="15" height="18" fill="#654321" rx="3" />
+                    </svg>
+                  </div>
+
+                  {/* Frogs on the couch */}
+                  <AnimatePresence>
+                    {frogsArray.map((frog, index) => {
+                      // Position frogs on each cushion
+                      const xPositions = [100, 250, 400]; // Left, center, right cushions
+                      const frogX = xPositions[index] || 250;
+                      const frogY = 100; // Sitting on cushions
+
+                      return (
+                        <Frog
+                          key={frog.id}
+                          frog={{
+                            ...frog,
+                            targetX: frogX,
+                            targetY: frogY
+                          }}
+                        />
+                      );
+                    })}
+                  </AnimatePresence>
                 </div>
               ) : (
                 <p className="text-gray-400">No frogs found. Initialize Firebase database!</p>
